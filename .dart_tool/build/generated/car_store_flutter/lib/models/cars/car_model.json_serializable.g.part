@@ -53,6 +53,7 @@ _$_CarModel _$$_CarModelFromJson(Map<String, dynamic> json) => _$_CarModel(
       image: json['image'] as String,
       city_id: json['city_id'] as int,
       year: json['year'] as int,
+      model_id: json['model_id'] as int,
     );
 
 Map<String, dynamic> _$$_CarModelToJson(_$_CarModel instance) =>
@@ -107,4 +108,5 @@ Map<String, dynamic> _$$_CarModelToJson(_$_CarModel instance) =>
       'image': instance.image,
       'city_id': instance.city_id,
       'year': instance.year,
+      'model_id': instance.model_id,
     };

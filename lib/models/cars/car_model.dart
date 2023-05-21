@@ -57,6 +57,7 @@ class CarModel with _$CarModel {
     required String image,
     required int city_id,
     required int year,
+    required int model_id,
   }) = _CarModel;
 
   factory CarModel.fromJson(JSON json) => _$CarModelFromJson(json);

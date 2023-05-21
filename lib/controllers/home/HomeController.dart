@@ -8,17 +8,21 @@ import 'package:car_store_flutter/pages/tabs/UserTab.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_advanced_drawer/flutter_advanced_drawer.dart';
 import 'package:get/get.dart';
-import 'package:get_storage/get_storage.dart';
 import 'package:numberpicker/numberpicker.dart';
 import '../../models/cities/city_model.dart';
+import '../../models/comapny_models.dart/company_models.dart';
 import '../../models/companies/company_model.dart';
+import '../../models/companies_test/company.dart';
 import '../../models/exhibitions/exhibition_model.dart';
 import '../../models/cars/car_model.dart';
 import '../../providers/car_provider.dart';
 import '../../providers/city_provider.dart';
+import '../../providers/company_models_provider.dart';
 import '../../providers/company_provider.dart';
 import '../../providers/exhibition_provider.dart';
 import '../../pages/tabs/info_tab.dart';
+import '../../repositories/car_repository.dart';
+import '../../repositories/filter_types.dart';
 import '../cars/car_controller.dart';
 
 class HomeController extends GetxController {
@@ -35,6 +39,7 @@ class HomeController extends GetxController {
   late ExhibitionProvider _exhibitionProvider = Get.find();
   late CityProvider _cityProvider = Get.find();
   late CompanyProvider _companyProvider = Get.find();
+  late CompanyModelsProvider _companyModelsProvider = Get.find();
   late CarController _carController = Get.find<CarController>();
 
   // late CarProvider _carProvider = Get.find();
@@ -62,9 +67,11 @@ class HomeController extends GetxController {
   var minDate = 0.obs;
   var maxDate = 0.obs;
   var selectedCity = 0.obs;
-  var selectedCompany = ''.obs;
-  var selectedStore = ''.obs;
-  var companies = <CompanyModel>[].obs;
+  var selectedCompany = 0.obs;
+  var selectedCompanyModel = 0.obs;
+  var selectedStore = 0.obs;
+  var companies = <Company>[].obs;
+  var companyModels = <CompanyModels>[].obs;
   var cities = <CityModel>[].obs;
 
   List<Widget> pages = [
@@ -106,6 +113,14 @@ class HomeController extends GetxController {
     _companyProvider.getCompanies().then((comps) {
       // carsLoaded.value = true;
       companies.value = comps;
+      debugPrint(companies.toString());
+    });
+  }
+
+  void getCompanyModels(int id) {
+    _companyModelsProvider.getCompanies(id).then((comps) {
+      // carsLoaded.value = true;
+      companyModels.value = comps;
       debugPrint(companies.toString());
     });
   }
@@ -175,12 +190,12 @@ class HomeController extends GetxController {
               topLeft: Radius.circular(16),
               topRight: Radius.circular(16),
             )),
-        child: Wrap(
-          verticalDirection: VerticalDirection.down,
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: Row(
+        child: CustomScrollView(
+          slivers: [
+            SliverAppBar(
+              // automaticallyImplyLeading: false,
+
+              title: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
@@ -190,173 +205,227 @@ class HomeController extends GetxController {
                   clearFilterButton()
                 ],
               ),
+              pinned: true,
+              floating: true,
             ),
-            filterItem(title: 'price'.tr, children: [
-              Obx(() => Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            SliverList(
+              delegate: SliverChildListDelegate([
+                filterItem(title: 'price'.tr, children: [
+                  Obx(() => Column(
                         children: [
-                          Text('from'.tr),
-                          NumberPicker(
-                            value: minPrice.value,
-                            minValue: defaultMinPrice,
-                            maxValue: 299000,
-                            step: 1000,
-                            selectedTextStyle:
-                                TextStyle(color: ColorConstants.green),
-                            haptics: true,
-                            onChanged: (value) {
-                              minPrice.value = value;
-                            },
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(16),
-                              border: Border.all(color: Colors.black26),
-                            ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text('from'.tr),
+                              NumberPicker(
+                                value: minPrice.value,
+                                minValue: defaultMinPrice,
+                                maxValue: 299000,
+                                step: 1000,
+                                selectedTextStyle:
+                                    TextStyle(color: ColorConstants.green),
+                                haptics: true,
+                                onChanged: (value) {
+                                  minPrice.value = value;
+                                },
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(color: Colors.black26),
+                                ),
+                              ),
+                              Text('to'.tr),
+                              NumberPicker(
+                                value: maxPrice.value,
+                                minValue: 5000,
+                                maxValue: defaultMaxPrice,
+                                step: 1000,
+                                selectedTextStyle:
+                                    TextStyle(color: ColorConstants.green),
+                                haptics: true,
+                                onChanged: (value) {
+                                  maxPrice.value = value;
+                                },
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(color: Colors.black26),
+                                ),
+                              ),
+                            ],
                           ),
-                          Text('to'.tr),
-                          NumberPicker(
-                            value: maxPrice.value,
-                            minValue: 5000,
-                            maxValue: defaultMaxPrice,
-                            step: 1000,
-                            selectedTextStyle:
-                                TextStyle(color: ColorConstants.green),
-                            haptics: true,
-                            onChanged: (value) {
-                              maxPrice.value = value;
+                          filterButton(
+                            data: {
+                              'min': minPrice.value,
+                              'high': maxPrice.value
                             },
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(16),
-                              border: Border.all(color: Colors.black26),
+                            filterType: FilterTypes.price,
+                          )
+                        ],
+                      )),
+                ]),
+                filterItem(title: 'date'.tr, children: [
+                  Obx(() => Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text('from'.tr),
+                              NumberPicker(
+                                value: minDate.value,
+                                minValue: defaultMinDate,
+                                maxValue: defaultMaxDate,
+                                step: 1,
+                                selectedTextStyle:
+                                    TextStyle(color: ColorConstants.green),
+                                haptics: true,
+                                onChanged: (value) {
+                                  minDate.value = value;
+                                },
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(color: Colors.black26),
+                                ),
+                              ),
+                              Text('to'.tr),
+                              NumberPicker(
+                                value: maxDate.value,
+                                minValue: defaultMinDate,
+                                maxValue: defaultMaxDate,
+                                step: 1,
+                                selectedTextStyle:
+                                    TextStyle(color: ColorConstants.green),
+                                haptics: true,
+                                onChanged: (value) {
+                                  maxDate.value = value;
+                                },
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(color: Colors.black26),
+                                ),
+                              ),
+                            ],
+                          ),
+                          filterButton(
+                            data: {'min': minDate.value, 'high': maxDate.value},
+                            filterType: FilterTypes.year,
+                          )
+                        ],
+                      )),
+                ]),
+                filterItem(title: 'city'.tr, children: [
+                  Obx(() => Column(
+                        children: [
+                          Wrap(
+                              spacing: 5.0,
+                              direction: Axis.horizontal,
+                              children: cities
+                                  .map((element) => _buildCityChipItem(
+                                      element.city_enname.tr,
+                                      cities.indexOf(element)))
+                                  .toList()
+                              // [
+                              //   _buildCityChipItem(cities[0].city_enname.tr, 0),
+                              //   _buildCityChipItem(cities[1].city_enname.tr, 1),
+                              //   _buildCityChipItem(cities[2].city_enname.tr, 2),
+                              //   _buildCityChipItem(cities[3].city_enname.tr, 3),
+                              // ],
+                              ),
+                          filterButton(
+                            data: {
+                              'id': selectedCity.value == -1
+                                  ? 0
+                                  : cities[selectedCity.value]
+                            },
+                            filterType: FilterTypes.city,
+                          )
+                        ],
+                      ))
+                ]),
+                ExpansionTile(
+                  title: Text('company'.tr),
+                  textColor: ColorConstants.green,
+                  iconColor: ColorConstants.green,
+                  children: [
+                    Obx(() => Column(
+                          children: [
+                            Wrap(
+                              children: companies
+                                  .map((element) => ExpansionTile(
+                                        childrenPadding:
+                                            const EdgeInsets.symmetric(
+                                                horizontal: 3),
+                                        tilePadding: const EdgeInsets.symmetric(
+                                            horizontal: 30),
+                                        title: Text(element.name),
+                                        textColor: ColorConstants.green,
+                                        iconColor: ColorConstants.green,
+                                        onExpansionChanged: (isExpanded) {
+                                          selectedCompany.value = element.id;
+                                          debugPrint(
+                                              'selected company ${element.id}');
+                                        },
+                                        children: element.models
+                                            .map(
+                                              (element) => RadioListTile(
+                                                  selectedTileColor:
+                                                      ColorConstants.green,
+                                                  activeColor:
+                                                      ColorConstants.green,
+                                                  value: element.id,
+                                                  title: Text(element.name),
+                                                  groupValue:
+                                                      selectedCompanyModel
+                                                          .value,
+                                                  onChanged: (val) {
+                                                    selectedCompanyModel.value =
+                                                        val!;
+                                                    debugPrint(
+                                                        'selected model${selectedCompanyModel.value}');
+                                                  }),
+                                            )
+                                            .toList(),
+                                      ))
+                                  .toList(),
                             ),
+                            filterButton(
+                              // data: {
+                              //   'model_id': selectedCompanyModel.value,
+                              //   'company_id': selectedCompany.value
+                              // },
+                              data: {
+                                'id': selectedCompanyModel.value,
+                              },
+                              filterType: FilterTypes.model,
+                            )
+                          ],
+                        )),
+                  ],
+                ),
+                filterItem(title: 'exhibition'.tr, children: [
+                  Obx(() => Column(
+                        children: [
+                          Wrap(
+                            children: stores
+                                .map((element) => RadioListTile(
+                                    selectedTileColor: ColorConstants.green,
+                                    activeColor: ColorConstants.green,
+                                    value: element.id,
+                                    title: Text(element.name),
+                                    groupValue: selectedStore.value,
+                                    onChanged: (val) =>
+                                        selectedStore.value = val!))
+                                .toList(),
+                          ),
+                          filterButton(
+                            data: {'id': selectedStore.value},
+                            filterType: FilterTypes.exhibition,
                           ),
                         ],
-                      ),
-                      filterButton(
-                          data: {'min': minPrice.value, 'max': maxPrice.value},
-                          filterPrice: true)
-                    ],
-                  )),
-            ]),
-            filterItem(title: 'date'.tr, children: [
-              Obx(() => Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text('from'.tr),
-                          NumberPicker(
-                            value: minDate.value,
-                            minValue: defaultMinDate,
-                            maxValue: defaultMaxDate,
-                            step: 1,
-                            selectedTextStyle:
-                                TextStyle(color: ColorConstants.green),
-                            haptics: true,
-                            onChanged: (value) {
-                              minDate.value = value;
-                            },
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(16),
-                              border: Border.all(color: Colors.black26),
-                            ),
-                          ),
-                          Text('to'.tr),
-                          NumberPicker(
-                            value: maxDate.value,
-                            minValue: defaultMinDate,
-                            maxValue: defaultMaxDate,
-                            step: 1,
-                            selectedTextStyle:
-                                TextStyle(color: ColorConstants.green),
-                            haptics: true,
-                            onChanged: (value) {
-                              maxDate.value = value;
-                            },
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(16),
-                              border: Border.all(color: Colors.black26),
-                            ),
-                          ),
-                        ],
-                      ),
-                      filterButton(
-                          data: {'min': minDate.value, 'max': maxDate.value},
-                          filterDate: true)
-                    ],
-                  )),
-            ]),
-            filterItem(title: 'city'.tr, children: [
-              Obx(() => Column(
-                    children: [
-                      Wrap(
-                          spacing: 5.0,
-                          direction: Axis.horizontal,
-                          children: cities
-                              .map((element) => _buildCityChipItem(
-                                  element.city_enname.tr,
-                                  cities.indexOf(element)))
-                              .toList()
-                          // [
-                          //   _buildCityChipItem(cities[0].city_enname.tr, 0),
-                          //   _buildCityChipItem(cities[1].city_enname.tr, 1),
-                          //   _buildCityChipItem(cities[2].city_enname.tr, 2),
-                          //   _buildCityChipItem(cities[3].city_enname.tr, 3),
-                          // ],
-                          ),
-                      filterButton(data: {
-                        'name': selectedCity.value == -1
-                            ? 'none'
-                            : cities[selectedCity.value]
-                      }, filterCity: true)
-                    ],
-                  ))
-            ]),
-            filterItem(title: 'company'.tr, children: [
-              Obx(() => Column(
-                    children: [
-                      Wrap(
-                        children: companies
-                            .map((element) => RadioListTile(
-                                selectedTileColor: ColorConstants.green,
-                                activeColor: ColorConstants.green,
-                                value: element.name,
-                                title: Text(element.name),
-                                groupValue: selectedCompany.value,
-                                onChanged: (val) =>
-                                    selectedCompany.value = val ?? ''))
-                            .toList(),
-                      ),
-                      filterButton(
-                          data: {'name': selectedCompany.value},
-                          filterCompany: true),
-                    ],
-                  )),
-            ]),
-            filterItem(title: 'exhibition'.tr, children: [
-              Obx(() => Column(
-                    children: [
-                      Wrap(
-                        children: stores
-                            .map((element) => RadioListTile(
-                                selectedTileColor: ColorConstants.green,
-                                activeColor: ColorConstants.green,
-                                value: element.name,
-                                title: Text(element.name),
-                                groupValue: selectedStore.value,
-                                onChanged: (val) =>
-                                    selectedStore.value = val ?? ''))
-                            .toList(),
-                      ),
-                      filterButton(
-                          data: {'name': selectedStore.value},
-                          filterStore: true),
-                    ],
-                  )),
-            ]),
-            const SizedBox(
-              height: 90,
+                      )),
+                ]),
+                const SizedBox(
+                  height: 90,
+                ),
+              ]),
             ),
           ],
         ),
@@ -375,27 +444,61 @@ class HomeController extends GetxController {
   }
 
   Widget filterButton({
+    required FilterTypes filterType,
     required Map<String, dynamic> data,
-    bool filterPrice = false,
-    bool filterDate = false,
-    bool filterCity = false,
-    bool filterCompany = false,
-    bool filterStore = false,
   }) {
     return MaterialButton(
       color: ColorConstants.green,
       onPressed: () {
-        if (filterPrice) {
-          _carController.filterCarsByPrice(data['min'], data['max']);
-        } else if (filterDate) {
-          _carController.filterCarsByDate(data['min'], data['max']);
-        } else if (filterCity) {
-          if (data['name'] == 'none') return;
-          _carController.filterCarsByCity(data['name']);
-        } else if (filterCompany) {
-          _carController.filterCarsByCompany(data['name']);
-        } else if (filterStore) {
-          _carController.filterCarsByStore(data['name']);
+        switch (filterType) {
+          case FilterTypes.year:
+            _carController.filterCars(
+              filterType: FilterTypes.year,
+              data: {
+                'low': data['min'],
+                'high': data['high'],
+              },
+            );
+            break;
+          case FilterTypes.price:
+            _carController.filterCars(
+              filterType: FilterTypes.price,
+              data: {
+                'low': data['min'],
+                'high': data['high'],
+              },
+            );
+            break;
+          case FilterTypes.company:
+            _carController.filterCars(filterType: FilterTypes.company, data: {
+              'id': data['id'],
+            });
+            break;
+          case FilterTypes.model:
+            _carController.filterCars(filterType: FilterTypes.model, data: {
+              'id': data['id'],
+            });
+            break;
+          case FilterTypes.city:
+            {
+              if (data['cityId'] == 0) return;
+              _carController.filterCars(
+                filterType: FilterTypes.city,
+                data: {
+                  'id': data['id'],
+                },
+              );
+            }
+            break;
+          case FilterTypes.exhibition:
+            _carController
+                .filterCars(filterType: FilterTypes.exhibition, data: {
+              'id': data['id'],
+            });
+            break;
+          case FilterTypes.companyModel:
+            // TODO: Handle this case.
+            break;
         }
       },
       child: Text('filter'.tr),
@@ -411,7 +514,6 @@ class HomeController extends GetxController {
       },
       child: Text(
         'clearFilters'.tr,
-        // style: TextStyle(color: ColorConstants.green),
       ),
     );
   }
@@ -422,8 +524,8 @@ class HomeController extends GetxController {
     minDate.value = defaultMinDate;
     maxDate.value = defaultMaxDate;
     selectedCity.value = -1;
-    selectedStore.value = '';
-    selectedCompany.value = '';
+    selectedStore.value = 0;
+    selectedCompany.value = 0;
   }
 
   Widget _buildCityChipItem(String title, int index) {
@@ -439,15 +541,6 @@ class HomeController extends GetxController {
       ),
     );
   }
-
-  // void buildCitiesList() {
-  //   cities.value = [
-  //     'baghdad',
-  //     'erbil',
-  //     'dohuk',
-  //     'suleymaniyah',
-  //   ];
-  // }
 
   void selectCity(int index) {
     if (index == -1) {

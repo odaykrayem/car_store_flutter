@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:car_store_flutter/controllers/language/LanguagesController.dart';
 import 'package:car_store_flutter/controllers/theme/ThemesController.dart';
 import 'package:car_store_flutter/services/networking/httoover.dart';
+import 'package:car_store_flutter/shared/scroll_glow_remover.dart';
 import 'package:car_store_flutter/themes/Themes.dart';
 import 'package:car_store_flutter/translation/localization/localization.dart';
 import 'package:get/get.dart';
@@ -28,6 +29,12 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
+      builder: (context, child) {
+        return ScrollConfiguration(
+          behavior: MyBehavior(),
+          child: child!,
+        );
+      },
       debugShowCheckedModeBanner: false,
       title: 'Auto mart',
       theme: Themes.darkTheme,

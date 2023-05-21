@@ -1,6 +1,7 @@
 // ignore_for_file: file_names
 import 'package:car_store_flutter/repositories/car_repository.dart';
 import '../models/cars/car_model.dart';
+import '../repositories/filter_types.dart';
 
 class CarProvider {
   final CarRepository _carRepository;
@@ -28,6 +29,18 @@ class CarProvider {
 
   Future<List<CarModel>> getStoreCars(int id) async {
     var cars = await _carRepository.getStoreCars(id);
+
+    return cars;
+  }
+
+  Future<List<CarModel>> filterCars({
+    required FilterTypes filterType,
+    required Map<String, dynamic> data,
+  }) async {
+    var cars = await _carRepository.filterCars(
+      filterType: filterType,
+      data: data,
+    );
 
     return cars;
   }

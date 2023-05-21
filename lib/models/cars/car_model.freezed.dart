@@ -72,7 +72,8 @@ class _$CarModelTearOff {
       required String type,
       required String image,
       required int city_id,
-      required int year}) {
+      required int year,
+      required int model_id}) {
     return _CarModel(
       id: id,
       name: name,
@@ -124,6 +125,7 @@ class _$CarModelTearOff {
       image: image,
       city_id: city_id,
       year: year,
+      model_id: model_id,
     );
   }
 
@@ -187,6 +189,7 @@ mixin _$CarModel {
   String get image => throw _privateConstructorUsedError;
   int get city_id => throw _privateConstructorUsedError;
   int get year => throw _privateConstructorUsedError;
+  int get model_id => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -248,7 +251,8 @@ abstract class $CarModelCopyWith<$Res> {
       String type,
       String image,
       int city_id,
-      int year});
+      int year,
+      int model_id});
 }
 
 /// @nodoc
@@ -311,6 +315,7 @@ class _$CarModelCopyWithImpl<$Res> implements $CarModelCopyWith<$Res> {
     Object? image = freezed,
     Object? city_id = freezed,
     Object? year = freezed,
+    Object? model_id = freezed,
   }) {
     return _then(_value.copyWith(
       id: id == freezed
@@ -513,6 +518,10 @@ class _$CarModelCopyWithImpl<$Res> implements $CarModelCopyWith<$Res> {
           ? _value.year
           : year // ignore: cast_nullable_to_non_nullable
               as int,
+      model_id: model_id == freezed
+          ? _value.model_id
+          : model_id // ignore: cast_nullable_to_non_nullable
+              as int,
     ));
   }
 }
@@ -572,7 +581,8 @@ abstract class _$CarModelCopyWith<$Res> implements $CarModelCopyWith<$Res> {
       String type,
       String image,
       int city_id,
-      int year});
+      int year,
+      int model_id});
 }
 
 /// @nodoc
@@ -636,6 +646,7 @@ class __$CarModelCopyWithImpl<$Res> extends _$CarModelCopyWithImpl<$Res>
     Object? image = freezed,
     Object? city_id = freezed,
     Object? year = freezed,
+    Object? model_id = freezed,
   }) {
     return _then(_CarModel(
       id: id == freezed
@@ -838,6 +849,10 @@ class __$CarModelCopyWithImpl<$Res> extends _$CarModelCopyWithImpl<$Res>
           ? _value.year
           : year // ignore: cast_nullable_to_non_nullable
               as int,
+      model_id: model_id == freezed
+          ? _value.model_id
+          : model_id // ignore: cast_nullable_to_non_nullable
+              as int,
     ));
   }
 }
@@ -895,7 +910,8 @@ class _$_CarModel implements _CarModel {
       required this.type,
       required this.image,
       required this.city_id,
-      required this.year});
+      required this.year,
+      required this.model_id});
 
   factory _$_CarModel.fromJson(Map<String, dynamic> json) =>
       _$$_CarModelFromJson(json);
@@ -1000,10 +1016,12 @@ class _$_CarModel implements _CarModel {
   final int city_id;
   @override
   final int year;
+  @override
+  final int model_id;
 
   @override
   String toString() {
-    return 'CarModel(id: $id, name: $name, price: $price, company: $company, finger_door: $finger_door, sensors: $sensors, camera: $camera, wheel_size: $wheel_size, lamps: $lamps, auto_park: $auto_park, cruise_control: $cruise_control, lane_keep_assist: $lane_keep_assist, mirror: $mirror, color: $color, body_type: $body_type, import_from: $import_from, status: $status, warranty: $warranty, window_type: $window_type, air_bags: $air_bags, screen: $screen, gps: $gps, fridge: $fridge, seats: $seats, hud_system: $hud_system, sound_system: $sound_system, seats_type: $seats_type, slide_roof: $slide_roof, seats_color: $seats_color, transmission: $transmission, cylinders: $cylinders, fuel: $fuel, engine: $engine, horsepower: $horsepower, turbo: $turbo, wheel_drive_system: $wheel_drive_system, vehicle_height_control: $vehicle_height_control, room_id: $room_id, room_name: $room_name, room_details: $room_details, vip: $vip, city_enname: $city_enname, make: $make, class_s: $class_s, phone: $phone, model: $model, type: $type, image: $image, city_id: $city_id, year: $year)';
+    return 'CarModel(id: $id, name: $name, price: $price, company: $company, finger_door: $finger_door, sensors: $sensors, camera: $camera, wheel_size: $wheel_size, lamps: $lamps, auto_park: $auto_park, cruise_control: $cruise_control, lane_keep_assist: $lane_keep_assist, mirror: $mirror, color: $color, body_type: $body_type, import_from: $import_from, status: $status, warranty: $warranty, window_type: $window_type, air_bags: $air_bags, screen: $screen, gps: $gps, fridge: $fridge, seats: $seats, hud_system: $hud_system, sound_system: $sound_system, seats_type: $seats_type, slide_roof: $slide_roof, seats_color: $seats_color, transmission: $transmission, cylinders: $cylinders, fuel: $fuel, engine: $engine, horsepower: $horsepower, turbo: $turbo, wheel_drive_system: $wheel_drive_system, vehicle_height_control: $vehicle_height_control, room_id: $room_id, room_name: $room_name, room_details: $room_details, vip: $vip, city_enname: $city_enname, make: $make, class_s: $class_s, phone: $phone, model: $model, type: $type, image: $image, city_id: $city_id, year: $year, model_id: $model_id)';
   }
 
   @override
@@ -1077,7 +1095,8 @@ class _$_CarModel implements _CarModel {
             const DeepCollectionEquality().equals(other.type, type) &&
             const DeepCollectionEquality().equals(other.image, image) &&
             const DeepCollectionEquality().equals(other.city_id, city_id) &&
-            const DeepCollectionEquality().equals(other.year, year));
+            const DeepCollectionEquality().equals(other.year, year) &&
+            const DeepCollectionEquality().equals(other.model_id, model_id));
   }
 
   @override
@@ -1132,7 +1151,8 @@ class _$_CarModel implements _CarModel {
         const DeepCollectionEquality().hash(type),
         const DeepCollectionEquality().hash(image),
         const DeepCollectionEquality().hash(city_id),
-        const DeepCollectionEquality().hash(year)
+        const DeepCollectionEquality().hash(year),
+        const DeepCollectionEquality().hash(model_id)
       ]);
 
   @JsonKey(ignore: true)
@@ -1197,7 +1217,8 @@ abstract class _CarModel implements CarModel {
       required String type,
       required String image,
       required int city_id,
-      required int year}) = _$_CarModel;
+      required int year,
+      required int model_id}) = _$_CarModel;
 
   factory _CarModel.fromJson(Map<String, dynamic> json) = _$_CarModel.fromJson;
 
@@ -1301,6 +1322,8 @@ abstract class _CarModel implements CarModel {
   int get city_id;
   @override
   int get year;
+  @override
+  int get model_id;
   @override
   @JsonKey(ignore: true)
   _$CarModelCopyWith<_CarModel> get copyWith =>

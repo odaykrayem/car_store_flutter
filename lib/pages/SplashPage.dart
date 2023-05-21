@@ -35,7 +35,7 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Container(
-        decoration: const BoxDecoration(color: Colors.white),
+        decoration: BoxDecoration(color: ColorConstants.gray450),
         child: Scaffold(
             backgroundColor: Colors.transparent,
             body: Center(

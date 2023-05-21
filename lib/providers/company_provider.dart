@@ -1,5 +1,6 @@
 // ignore_for_file: file_names
 import '../models/companies/company_model.dart';
+import '../models/companies_test/company.dart';
 import '../repositories/company_repo.dart';
 
 class CompanyProvider {
@@ -7,7 +8,7 @@ class CompanyProvider {
 
   CompanyProvider(this._companyRepository);
 
-  Future<List<CompanyModel>> getCompanies() async {
+  Future<List<Company>> getCompanies() async {
     var companies = await _companyRepository.getCompnaies();
     return companies;
   }
